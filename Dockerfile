@@ -33,7 +33,14 @@ RUN echo '<Directory /var/www/html>' > /etc/apache2/conf-available/allow-overrid
     echo '    AllowOverride All' >> /etc/apache2/conf-available/allow-override.conf && \
     echo '    Require all granted' >> /etc/apache2/conf-available/allow-override.conf && \
     echo '</Directory>' >> /etc/apache2/conf-available/allow-override.conf && \
-    a2enconf allow-override
+    a2enconf allow-override && \
+    echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/document-root.conf && \
+    echo '<Directory /var/www/html/public>' >> /etc/apache2/conf-available/document-root.conf && \
+    echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/document-root.conf && \
+    echo '    AllowOverride All' >> /etc/apache2/conf-available/document-root.conf && \
+    echo '    Require all granted' >> /etc/apache2/conf-available/document-root.conf && \
+    echo '</Directory>' >> /etc/apache2/conf-available/document-root.conf && \
+    a2enconf document-root
 
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
