@@ -39,6 +39,7 @@ RUN echo '<Directory /var/www/html>' > /etc/apache2/conf-available/allow-overrid
     echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/document-root.conf && \
     echo '    AllowOverride All' >> /etc/apache2/conf-available/document-root.conf && \
     echo '    Require all granted' >> /etc/apache2/conf-available/document-root.conf && \
+    echo '    DirectoryIndex index.php' >> /etc/apache2/conf-available/document-root.conf && \
     echo '</Directory>' >> /etc/apache2/conf-available/document-root.conf && \
     a2enconf document-root
 

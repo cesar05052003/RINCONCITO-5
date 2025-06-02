@@ -9,7 +9,9 @@ use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 // Vista principal de bienvenida o landing
-Route::get('/', [PlatoController::class, 'index'])->name('welcome');
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
 
 Route::post('/guardar-resena', [PlatoController::class, 'guardarResena'])->name('guardarResena');
 
