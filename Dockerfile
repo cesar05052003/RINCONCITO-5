@@ -27,6 +27,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Habilitar mod_rewrite para Apache
 RUN a2enmod rewrite
 
+# Configurar Apache para permitir .htaccess y acceso al directorio /var/www/html
+RUN echo '<Directory /var/www/html>' > /etc/apache2/conf-available/allow-override.conf && \
+    echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/allow-override.conf && \
+    echo '    AllowOverride All' >> /etc/apache2/conf-available/allow-override.conf && \
+    echo '    Require all granted' >> /etc/apache2/conf-available/allow-override.conf && \
+    echo '</Directory>' >> /etc/apache2/conf-available/allow-override.conf && \
+    a2enconf allow-override
+
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
 
