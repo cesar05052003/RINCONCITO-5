@@ -1,0 +1,8 @@
+libxml2-dev \
+    libonig-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+=======
+    libicu-dev \
+    libxml2-dev \
+    libonig-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
