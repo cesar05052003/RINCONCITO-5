@@ -5,12 +5,15 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
+use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
 class Handler extends ExceptionHandler
 {
     /**
      * A list of the exception types that are not reported.
      *
-     * @var array<int, class-string<Throwable>>
+     * @var array<int, class-string<\Throwable>>
      */
     protected $dontReport = [
         //
@@ -45,5 +48,21 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * Render an exception to the console.
+     *
+     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function renderForConsole($output, Throwable $e)
+    {
+        if (is_null($output)) {
+            $output = new ConsoleOutput();
+        }
+
+        (new ConsoleApplication)->renderThrowable($e, $output);
     }
 }
