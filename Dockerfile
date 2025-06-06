@@ -1,36 +1,22 @@
-# Usamos una imagen base oficial de PHP con Apache
+# Imagen base con PHP y Apache
 FROM php:8.2-apache
 
-# Instala dependencias del sistema necesarias
+# Habilitar extensiones necesarias para Laravel
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libzip-dev \
-    zip \
-    curl \
-    npm \
-    nodejs \
     libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    libxml2-dev \
     libonig-dev \
-    pkg-config \
-    build-essential \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo pdo_mysql intl xml mbstring
+    libxml2-dev \
+    zip \
+    curl && \
+    docker-php-ext-install pdo pdo_mysql zip
 
-# Instala Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copia el código fuente del proyecto
-COPY . /var/www/html
-
-# Habilita mod_rewrite para Apache
+# Habilitar módulo de reescritura de Apache
 RUN a2enmod rewrite
 
-# Cambia el DocumentRoot a /public
+# Configurar Apache con DocumentRoot en public/
 RUN echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/document-root.conf && \
     echo '<Directory /var/www/html/public>' >> /etc/apache2/conf-available/document-root.conf && \
     echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/document-root.conf && \
@@ -53,24 +39,20 @@ RUN echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/docum
     echo '</VirtualHost>' >> /etc/apache2/sites-available/000-rinconcito.conf && \
     a2ensite 000-rinconcito.conf
 
-# Establece el directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /var/www/html
 
-# Instala dependencias PHP con Composer
-RUN composer install --no-dev --optimize-autoloader
+# Copiar archivos de la aplicación al contenedor (si estás usando Docker build)
+# COPY . .
 
-# Instala dependencias frontend (si usas Laravel Mix o Vite)
-RUN npm install && npm run build
+# Instalar Composer
+COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
-# Cambia permisos para Laravel (necesario para logs, sesiones, caché, etc.)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Dar permisos a Laravel (si ya está copiado)
+# RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
-# Cachear configuración para evitar error de APP_KEY en Render
-RUN php artisan config:cache
-
-# Exponer puerto 80
+# Puerto expuesto por Apache
 EXPOSE 80
 
-# Comando para iniciar Apache
+# Comando por defecto para iniciar Apache en primer plano
 CMD ["apache2-foreground"]
