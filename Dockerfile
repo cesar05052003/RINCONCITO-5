@@ -1,7 +1,7 @@
 # Imagen base con PHP y Apache
 FROM php:8.2-apache
 
-# Habilitar extensiones necesarias para Laravel
+# Instalar dependencias necesarias para Laravel
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 # Habilitar módulo de reescritura de Apache
 RUN a2enmod rewrite
 
-# Configurar Apache con DocumentRoot en public/
+# Configurar Apache para que apunte a /public
 RUN echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/document-root.conf && \
     echo '<Directory /var/www/html/public>' >> /etc/apache2/conf-available/document-root.conf && \
     echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/document-root.conf && \
@@ -42,17 +42,21 @@ RUN echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/docum
 # Establecer el directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar archivos de la aplicación al contenedor (si estás usando Docker build)
-# COPY . .
+# Copiar la aplicación Laravel al contenedor
+COPY . .
 
-# Instalar Composer
+# Instalar Composer (copiado desde contenedor oficial)
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
-# Dar permisos a Laravel (si ya está copiado)
-# RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+# Instalar dependencias de Laravel
+RUN composer install --no-dev --optimize-autoloader
 
-# Puerto expuesto por Apache
+# Ajustar permisos necesarios para Laravel
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache
+
+# Exponer el puerto por el que Apache servirá la app
 EXPOSE 80
 
-# Comando por defecto para iniciar Apache en primer plano
+# Comando por defecto para mantener Apache corriendo
 CMD ["apache2-foreground"]
