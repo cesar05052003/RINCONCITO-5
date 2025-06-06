@@ -1,27 +1,10 @@
 # Imagen base con PHP y Apache
 FROM php:8.2-apache
 
-# Instalar dependencias necesarias del sistema
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    curl
-
-# Instalar extensiones de PHP requeridas por Laravel y maatwebsite/excel
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install pdo pdo_mysql zip gd
-
-# Habilitar módulo de reescritura de Apache
+# Habilitar mod_rewrite de Apache
 RUN a2enmod rewrite
 
-# Configurar Apache para usar el directorio /public como raíz del sitio
+# Configurar DocumentRoot y VirtualHost para /public
 RUN echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/document-root.conf && \
     echo '<Directory /var/www/html/public>' >> /etc/apache2/conf-available/document-root.conf && \
     echo '    Options Indexes FollowSymLinks' >> /etc/apache2/conf-available/document-root.conf && \
@@ -44,23 +27,28 @@ RUN echo 'DocumentRoot /var/www/html/public' > /etc/apache2/conf-available/docum
     echo '</VirtualHost>' >> /etc/apache2/sites-available/000-rinconcito.conf && \
     a2ensite 000-rinconcito.conf
 
+# Instalar extensiones necesarias de PHP
+RUN apt-get update && apt-get install -y \
+    git curl zip unzip libpng-dev libonig-dev libxml2-dev libzip-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
+
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar Composer desde la imagen oficial
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+# Copiar el proyecto Laravel al contenedor
+COPY . /var/www/html
 
-# Copiar archivos del proyecto (opcional, si no lo haces en Render directo)
-# COPY . .
+# Copiar Composer desde imagen oficial
+COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 # Instalar dependencias de Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Ajustar permisos necesarios para Laravel
-# RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+# Asignar permisos necesarios a Laravel
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Puerto que expone Apache
+# Exponer puerto 80
 EXPOSE 80
 
-# Comando de inicio
+# Comando por defecto para Apache
 CMD ["apache2-foreground"]
