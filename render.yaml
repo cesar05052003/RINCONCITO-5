@@ -8,31 +8,33 @@ services:
     rootDir: .
     dockerContext: .
     dockerfilePath: ./Dockerfile
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    startCommand: apache2-foreground
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_KEY
-        value: base64:TU_APP_KEY_GENERADA
+        value: base64:Z0JHtrawlPDyZRCzXY9UUt70VUgAmxU8GMfYlWOesA0=
       - key: APP_URL
         value: https://rinconcito-laravel.onrender.com
-
-      # Configuración de base de datos (ajústala a tu base de datos real)
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        value: tu-db-host
+        value: brtfk1tfrgstxpixn0c3-mysql.services.clever-cloud.com
       - key: DB_PORT
         value: 3306
       - key: DB_DATABASE
-        value: tu-nombre-bd
+        value: brtfk1tfrgstxpixn0c3
       - key: DB_USERNAME
-        value: tu-usuario
+        value: uwhbwnuy5gibnqrh
       - key: DB_PASSWORD
-        value: tu-contraseña
-
-      # Otros drivers
+        value: T4MhdRbT2WbYwT550Obu
       - key: SESSION_DRIVER
         value: file
       - key: CACHE_DRIVER
