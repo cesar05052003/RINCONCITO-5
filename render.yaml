@@ -43,7 +43,11 @@ services:
         value: errorlog
 
     startCommand: |
-      composer install --no-dev --optimize-autoloader && 
+      mkdir -p storage/framework/cache &&
+      mkdir -p storage/framework/sessions &&
+      mkdir -p storage/framework/views &&
+      mkdir -p bootstrap/cache &&
+      composer install --no-dev --optimize-autoloader &&
       php artisan config:cache &&
       php artisan route:cache &&
       php artisan migrate --force &&
