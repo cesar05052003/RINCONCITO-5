@@ -21,3 +21,14 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# --- Excepciones necesarias para Laravel ---
+# Incluir storage y subdirectorios requeridos por Laravel
+!/storage
+!/storage/framework
+!/storage/framework/cache
+!/storage/framework/cache/data
+!/storage/framework/sessions
+!/storage/framework/testing
+!/storage/framework/views
+!/storage/framework/views/.gitignore
