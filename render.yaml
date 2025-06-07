@@ -8,29 +8,31 @@ services:
     rootDir: .
     dockerContext: .
     dockerfilePath: ./Dockerfile
+
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_KEY
-        value: base64:TU_APP_KEY_GENERADA
+        value: base64:4jOgGpYKjXMRKJ/Gzo2aY/yuLtiphT022jV38w+LJSA=  # ⚠️ ¡Debes generar esto con php artisan key:generate --show!
+
       - key: APP_URL
-        value: https://rinconcito-laravel.onrender.com
+        value: https://rinconcito-5.onrender.com
 
       # Configuración de base de datos
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        value: tu-db-host
+        value: brtfk1tfrgstxpixn0c3-mysql.services.clever-cloud.com
       - key: DB_PORT
         value: 3306
       - key: DB_DATABASE
-        value: tu-nombre-bd
+        value: brtfk1tfrgstxpixn0c3
       - key: DB_USERNAME
-        value: tu-usuario
+        value: uwhbwnuy5gibnqrh
       - key: DB_PASSWORD
-        value: tu-contraseña
+        value: T4MhdRbT2WbYwT550Obu
 
       # Otros drivers
       - key: SESSION_DRIVER
@@ -43,12 +45,14 @@ services:
         value: errorlog
 
     startCommand: |
-      mkdir -p storage/framework/cache &&
-      mkdir -p storage/framework/sessions &&
-      mkdir -p storage/framework/views &&
-      mkdir -p bootstrap/cache &&
-      composer install --no-dev --optimize-autoloader &&
-      php artisan config:cache &&
-      php artisan route:cache &&
-      php artisan migrate --force &&
+      mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache && \
+      chmod -R 775 storage bootstrap/cache && \
+      chown -R www-data:www-data storage bootstrap/cache && \
+      composer install --no-dev --optimize-autoloader && \
+      php artisan config:clear && \
+      php artisan cache:clear && \
+      php artisan view:clear && \
+      php artisan config:cache && \
+      php artisan route:cache && \
+      php artisan migrate --force && \
       apache2-foreground

@@ -44,12 +44,12 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 # Crear directorios necesarios de Laravel
 RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
 
-# Instalar dependencias de Laravel
-RUN composer install --no-dev --optimize-autoloader
-
 # Asignar permisos necesarios a Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
+
+# Instalar dependencias de Laravel
+RUN composer install --no-dev --optimize-autoloader
 
 # Exponer puerto 80
 EXPOSE 80
